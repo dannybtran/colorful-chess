@@ -1,11 +1,34 @@
 <!doctype html>
 <html>
   <head>
+    <style>
+      container { display: flex; }
+      #top { margin-top: 1rem; display: block; }
+      #board { width: 40%; display: flex; flex-wrap: wrap; margin-top: 1rem; }
+      #load { margin-left: 0.5rem; }
+      #side { padding: 1rem; width: 25%; }
+      #loadPgn { display: block; }
+      #pgn { width: 100%; height: 80%; }
+      .square { flex-basis: 12.5%; border: 2px solid rgba(0,0,0,0.1); box-sizing: border-box; position: relative; }
+      #board .influence { border: 2px solid black; }
+      #board .hovered { border: 2px solid chartreuse; }
+      .square:after { content: ""; display: block; padding-bottom: 100%; pointer-events: none; }
+      .square .piece { top: 0.8rem; left: 0; bottom: 0; right: 0; text-align: center; font-size: 3rem; position: absolute; line-height: 100%; pointer-events: none; }
+      .square .control { top: 0; left: 0; bottom: 0; right: 0; font-size: 1rem; position: absolute; line-height: 100%; display: none; }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js" integrity="sha512-xRllwz2gdZciIB+AkEbeq+gVhX8VB8XsfqeFbUh+SzHlN96dEduwtTuVuc2u9EROlmW9+yhRlxjif66ORpsgVA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </head>
   <body>
-    <label>FEN:</label><input type="text" id="fen" />
-    <div id="board" />
+    <div id="top">
+      <label>FEN:</label><input type="text" id="fen" /><button id="load">Load</button>
+    </div>
+    <container>
+      <div id="board"></div>
+      <div id="side">
+        <textarea id="pgn"></textarea>
+        <button id="loadPgn">Load</button>
+      </div>
+    </container>
   <script src="./script.js"></script>
   </body>
 </html>
