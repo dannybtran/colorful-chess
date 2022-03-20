@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width">
     <style>
       container { display: flex; flex-wrap: wrap; }
+      svg { transform: scale(0.8); }
       body { margin: 1rem; font-family: 'Helvetica'; }
       #board { width: 100%; display: flex; flex-wrap: wrap; margin-top: 1rem; }
       #load { margin-left: 0.5rem; }
@@ -22,18 +23,20 @@
         #side { width: 40%; padding-left: 1rem; }
         #pgn { font-size: 1rem; }
         #loadPgn { font-size: 1rem; }
+
       }
 
-      @media screen and (min-width: 1440px) {
+      @media screen and (min-width: 1024px) {
         #board { width: 40%; }
+        svg { transform: scale(1); }
       }
 
       .square { flex-basis: 12.5%; border: 2px solid rgba(0,0,0,0.1); box-sizing: border-box; position: relative; }
       #board .influence { border: 2px solid black; }
       #board .hovered { border: 2px solid chartreuse; }
       .square:after { content: ""; display: block; padding-bottom: 100%; pointer-events: none; }
-      .square .piece { top: 50%; left: 50%; text-align: left;
-        font-size: 3rem; position: absolute; line-height: 100%; pointer-events: none;
+      .square .piece { top: 50%; left: 50%;
+        position: absolute; line-height: 100%; pointer-events: none;
         transform: translate(-50% , -50%); }
       .square .control { top: 0; left: 0; bottom: 0; right: 0; font-size: 1rem; position: absolute; line-height: 100%; display: none; }
     </style>
@@ -46,7 +49,7 @@
     <container>
       <div id="board"></div>
       <div id="side">
-        <textarea id="pgn">{ Insert PGN here }</textarea>
+        <textarea id="pgn" placeholder="{ Insert PGN here }"></textarea>
         <button id="loadPgn">Load</button>
       </div>
     </container>
