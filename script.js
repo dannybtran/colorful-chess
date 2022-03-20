@@ -449,6 +449,7 @@ const goPgn = () => {
 
 const go = (chess) => {
   control = {}
+  influencers = {}
   $board.innerHTML = ''
   board = chess.board()
   for(id of Array(64).keys()) {
