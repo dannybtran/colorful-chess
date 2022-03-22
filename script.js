@@ -238,7 +238,6 @@ const go = (chess) => {
 };
 
 const squareHoverOn = (e) => {
-  const k = e.target.id.replace('s','')
   e.target.classList.add('hovered')
   const ins = Object.keys(influencers[e.target.id] || {})
   ins.forEach(i => {
