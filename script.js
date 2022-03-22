@@ -11,14 +11,15 @@ let influencers = {}; // object that stores list of the squares that are influen
                       // which means square 43 is influenced by the pieces on
                       // square 42 and square 57
 
-// this function takes a piece object (p) a square coordinate (sqr_xy) and an
-// influencer coordinate (inf_xy). it increment the color control of the square
+// `addControl` - this function takes a piece object (influencer) a square coordinate (sqr_xy)
+// and an influencer coordinate (inf_xy). it increment the color control of the square
 // based on the piece color and will add the influencer square to the list of
 // influencers of that square
 const addControl = (influencer, sqr_xy, inf_xy) => {
 
-  const k = sqr_xy.y * 8 + sqr_xy.x // calculate 0...63 value based on row/column coord
-  const target = board[sqr_xy.y][sqr_xy.x]
+  // calculate 0...63 value based on row/column coord
+  const k = sqr_xy.y * 8 + sqr_xy.x
+  const target_piece = board[sqr_xy.y][sqr_xy.x]
 
   // if entry doesn't exist in control object, create it
   control[k] = {
@@ -50,7 +51,7 @@ const addControl = (influencer, sqr_xy, inf_xy) => {
 
   // black control
   if (value < 0) {
-    if (target?.color === 'w') {
+    if (target_piece?.color === 'w') {
       // if this is a white piece and black is "in control" it's hanging
       $square.style.backgroundColor = color_hanging
     } else {
@@ -60,7 +61,7 @@ const addControl = (influencer, sqr_xy, inf_xy) => {
 
   // white control
   if (value > 0) {
-    if (target?.color === 'b') {
+    if (target_piece?.color === 'b') {
       $square.style.backgroundColor = color_hanging
     } else {
       $square.style.backgroundColor = color_white_controlled
@@ -74,198 +75,112 @@ const addControl = (influencer, sqr_xy, inf_xy) => {
 
 };
 
-const checkRook = (p, x, y) => {
-  // check up
-  let checkingUp = true
-  dy = -1
-  while (checkingUp) {
-    if (y + dy < 0 || y + dy > 7) { checkingUp = false }
-    else {
-      const newPiece = board[y + dy][x]
-      addControl(p, {x: x, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingUp = false
-      }
-      dy -= 1
-    }
-  }
-  // check right
-  let checkingRight = true
-  let dx = 1
-  while (checkingRight) {
-    if (x + dx < 0 || x + dx > 7) { checkingRight = false }
-    else {
-      const newPiece = board[y][x + dx]
-      addControl(p, {x: x + dx, y: y}, {x, y})
-      if (newPiece) {
-        checkingRight = false
-      }
-      dx += 1
-    }
-  }
-  // check down
-  let checkingDown = true
-  dy = 1
-  while (checkingDown) {
-    if (y + dy < 0 || y + dy > 7) { checkingDown = false }
-    else {
-      const newPiece = board[y + dy][x]
-      addControl(p, {x: x, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingDown = false
-      }
-      dy += 1
-    }
-  }
-  // check left
-  let checkingLeft = true
-  dx = -1
-  while (checkingLeft) {
-    if (x + dx < 0 || x + dx > 7) { checkingLeft = false }
-    else {
-      const newPiece = board[y][x + dx]
-      addControl(p, {x: x + dx, y: y}, {x, y})
-      if (newPiece) {
-        checkingLeft = false
-      }
-      dx -= 1
-    }
-  }
-};
-
-const checkBishop = (p, x, y) => {
-  // checkUpLeft
-  let checkingUpLeft = true
-  dy = -1
-  dx = -1
-  while (checkingUpLeft) {
-    if (y + dy < 0 || y + dy > 7 || x + dx < 0 || x + dx > 7) { checkingUpLeft = false }
-    else {
-      const newPiece = board[y + dy][x + dx]
-      addControl(p, {x: x + dx, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingUpLeft = false
-      }
-      dy -= 1
-      dx -= 1
-    }
-  }
-  // checkUpRight
-  let checkingUpRight = true
-  dy = -1
-  dx = 1
-  while (checkingUpRight) {
-    if (y + dy < 0 || y + dy > 7 || x + dx < 0 || x + dx > 7) { checkingUpRight = false }
-    else {
-      const newPiece = board[y + dy][x + dx]
-      addControl(p, {x: x + dx, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingUpRight = false
-      }
-      dy -= 1
-      dx += 1
-    }
-  }
-  // checkDownLeft
-  let checkingDownLeft = true
-  dy = 1
-  dx = -1
-  while (checkingDownLeft) {
-    if (y + dy < 0 || y + dy > 7 || x + dx < 0 || x + dx > 7) { checkingDownLeft = false }
-    else {
-      const newPiece = board[y + dy][x + dx]
-      addControl(p, {x: x + dx, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingDownLeft = false
-      }
-      dy += 1
-      dx -= 1
-    }
-  }
-  // checkDownRight
-  let checkingDownRight = true
-  dy = 1
-  dx = 1
-  while (checkingDownRight) {
-    if (y + dy < 0 || y + dy > 7 || x + dx < 0 || x + dx > 7) { checkingDownRight = false }
-    else {
-      const newPiece = board[y + dy][x + dx]
-      addControl(p, {x: x + dx, y: y + dy}, {x, y})
-      if (newPiece) {
-        checkingDownRight = false
-      }
-      dy += 1
-      dx += 1
-    }
-  }
-};
-
-const checkSquare = (p, sqr_xy, inf_xy) => {
+const calcSquare = (influencer, sqr_xy, inf_xy) => {
   const { x, y } = sqr_xy
-  if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-    addControl(p, sqr_xy, inf_xy)
+  if (y < 0 || y > 7 || x < 0 || x > 7) { return false; }
+  else {
+    addControl(influencer, sqr_xy, inf_xy)
+    if (board[sqr_xy.y][sqr_xy.x]) { return false; }
   }
+  return true;
 };
 
-const checkKing = (p, x, y) => {
-  checkSquare(p, {x: x - 1, y: y - 1}, {x, y})
-  checkSquare(p, {x: x + 0, y: y - 1}, {x, y})
-  checkSquare(p, {x: x + 1, y: y - 1}, {x, y})
-  checkSquare(p, {x: x - 1, y: y + 0}, {x, y})
-  checkSquare(p, {x: x + 1, y: y + 0}, {x, y})
-  checkSquare(p, {x: x - 1, y: y + 1}, {x, y})
-  checkSquare(p, {x: x + 0, y: y + 1}, {x, y})
-  checkSquare(p, {x: x + 1, y: y + 1}, {x, y})
+const calcRook = (influencer, inf_xy) => {
+  const {x, y} = inf_xy
+  let dy = 0
+  let dx = 0
+  // check up
+  dy = -1; dx = 0
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy -= 1 }
+  // check right
+  dy =  0; dx = 1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dx += 1 }
+  // check down
+  dy =  1; dx = 0
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy += 1 }
+  // check left
+  dy =  0; dx = -1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dx -= 1 }
 };
 
-const checkKnight = (p, x, y) => {
-  checkSquare(p, {x: x - 1, y: y - 2}, {x, y})
-  checkSquare(p, {x: x + 1, y: y - 2}, {x, y})
-  checkSquare(p, {x: x - 2, y: y - 1}, {x, y})
-  checkSquare(p, {x: x + 2, y: y - 1}, {x, y})
-  checkSquare(p, {x: x - 2, y: y + 1}, {x, y})
-  checkSquare(p, {x: x + 2, y: y + 1}, {x, y})
-  checkSquare(p, {x: x - 1, y: y + 2}, {x, y})
-  checkSquare(p, {x: x + 1, y: y + 2}, {x, y})
+const calcBishop = (influencer, inf_xy) => {
+  const {x, y} = inf_xy
+  let dy = 0
+  let dx = 0
+  // check up left
+  dy = -1; dx = -1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy -= 1; dx -= 1 }
+  // check up right
+  dy = -1; dx = 1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy -= 1; dx += 1 }
+  // check down left
+  dy = 1; dx = -1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy += 1; dx -= 1 }
+  // check down right
+  dy = 1; dx = 1
+  while(calcSquare(influencer, {x: x + dx, y: y + dy}, inf_xy)) { dy += 1; dx += 1 }
 };
 
-const checkPawn = (p, x, y) => {
-  switch(p?.color) {
+const calcKing = (influencer, inf_xy) => {
+  const {x, y} = inf_xy
+  calcSquare(influencer, {x: x - 1, y: y - 1}, inf_xy)
+  calcSquare(influencer, {x: x + 0, y: y - 1}, inf_xy)
+  calcSquare(influencer, {x: x + 1, y: y - 1}, inf_xy)
+  calcSquare(influencer, {x: x - 1, y: y + 0}, inf_xy)
+  calcSquare(influencer, {x: x + 1, y: y + 0}, inf_xy)
+  calcSquare(influencer, {x: x - 1, y: y + 1}, inf_xy)
+  calcSquare(influencer, {x: x + 0, y: y + 1}, inf_xy)
+  calcSquare(influencer, {x: x + 1, y: y + 1}, inf_xy)
+};
+
+const calcKnight = (influencer, inf_xy) => {
+  const {x, y} = inf_xy
+  calcSquare(influencer, {x: x - 1, y: y - 2}, inf_xy)
+  calcSquare(influencer, {x: x + 1, y: y - 2}, inf_xy)
+  calcSquare(influencer, {x: x - 2, y: y - 1}, inf_xy)
+  calcSquare(influencer, {x: x + 2, y: y - 1}, inf_xy)
+  calcSquare(influencer, {x: x - 2, y: y + 1}, inf_xy)
+  calcSquare(influencer, {x: x + 2, y: y + 1}, inf_xy)
+  calcSquare(influencer, {x: x - 1, y: y + 2}, inf_xy)
+  calcSquare(influencer, {x: x + 1, y: y + 2}, inf_xy)
+};
+
+const calcPawn = (influencer, inf_xy) => {
+  const {x, y} = inf_xy
+  switch(influencer?.color) {
     case 'w':
-      checkSquare(p, {x: x - 1, y: y - 1}, {x, y})
-      checkSquare(p, {x: x + 1, y: y - 1}, {x, y})
+      calcSquare(influencer, {x: x - 1, y: y - 1}, inf_xy)
+      calcSquare(influencer, {x: x + 1, y: y - 1}, inf_xy)
       break;
     case 'b':
-      checkSquare(p, {x: x - 1, y: y + 1}, {x, y})
-      checkSquare(p, {x: x + 1, y: y + 1}, {x, y})
+      calcSquare(influencer, {x: x - 1, y: y + 1}, inf_xy)
+      calcSquare(influencer, {x: x + 1, y: y + 1}, inf_xy)
       break;
   }
 };
 
-const calcControl = (p, x, y) => {
-  switch(p?.type) {
+const calcControl = (influencer, inf_xy) => {
+  switch(influencer?.type) {
     case 'r':
-      checkRook(p, x, y)
+      calcRook(influencer, inf_xy)
       break;
     case 'b':
-      checkBishop(p, x, y)
+      calcBishop(influencer, inf_xy)
       break;
     case 'q':
-      checkRook(p, x, y)
-      checkBishop(p, x, y)
+      calcRook(influencer, inf_xy)
+      calcBishop(influencer, inf_xy)
       break;
     case 'p':
-      checkPawn(p, x, y)
+      calcPawn(influencer, inf_xy)
       break;
     case 'k':
-      checkKing(p, x, y)
+      calcKing(influencer, inf_xy)
       break;
     case 'n':
-      checkKnight(p, x, y)
+      calcKnight(influencer, inf_xy)
       break;
   }
-
-
 };
 
 const goFen = () => {
@@ -293,24 +208,31 @@ const go = (chess) => {
     const $div = document.createElement('div')
     const $label1 = document.createElement('label')
     const $label2 = document.createElement('label')
+    const $darkener = document.createElement('div')
+    $darkener.classList.add('darkener')
     $label1.classList.add('piece')
     $label2.classList.add('control')
     $div.classList.add('square')
     $div.id = `s${id}`
+    if ((id%2 ? 0 : 1) === Math.floor(id/8)%2) {
+      $div.appendChild($darkener)
+    }
     $div.appendChild($label1)
     $div.appendChild($label2)
     $board.appendChild($div)
   }
 
-  // loop through the board array and calculate control
-  // and draw piece
-  board.map((r, y) => {
-    r.map((p, x) => {
-      const key = `s${y * 8 + x}`
-      const $square = document.getElementById(key)
-      const $piece = $square.getElementsByClassName('piece')[0]
-      calcControl(p, x, y)
-      $piece.innerHTML = (svgs[p?.type || ''] || {})[p?.color || ''] || ''
+  // loop through the board array and each time a piece (i.e. influencer)
+  // is found, calculate the control it exerts on squares
+  board.forEach((r, y) => {
+    r.forEach((influencer, x) => {
+      if (influencer) {
+        const key = `s${y * 8 + x}`
+        const $square = document.getElementById(key)
+        const $piece = $square.getElementsByClassName('piece')[0]
+        calcControl(influencer, {x, y})
+        $piece.innerHTML = (svgs[influencer?.type || ''] || {})[influencer?.color || ''] || ''
+      }
     })
   })
 };
